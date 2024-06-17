@@ -1,0 +1,12 @@
+
+vc:S5276­"[implicit conversion from 'SIZE_T' (aka 'unsigned long long') to 'double' may lose precision(¿øÔ‘8ºÛá‡ü1
+R	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(şœÒïşÿÿÿÿ
+R	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(¹…îùùÿÿÿÿ
+R	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(¨¶·Áøÿÿÿÿ
+M	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(õõ¶ô
+L	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(õÖÁW
+M	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(ä£á
+R	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(Éõ†óÿÿÿÿÿ
+L	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(üğ“+
+x	cpp:S5276­"[implicit conversion from 'SIZE_T' (aka 'unsigned long long') to 'double' may lose precision(¿øÔ‘8ÏŞüÌ÷1
+]	cpp:S6004ª"@Use the init-statement to declare "pmc" inside the if statement.(ğ”èñ8úŞüÌ÷1
