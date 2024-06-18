@@ -69,14 +69,55 @@
     a_res;                                  \
 })
 
-/// Inserts _str into $ _base at _index
-#define $insert(_base, _index, _str) ({ \
-    int blen = strlen(_base);           \
-    int slen = strlen(_str);            \
-    $ i_res = alloca(blen + slen + 1);  \
-    /*TODO IMPLEMENT*/                                \
-    strcpy(i_res, _base);               \
-    strcpy(i_res + _index, _str);\
+/// Creates a $ from another $
+/// @param _str : The $ to be copied
+/// @returns $ : The newly created $
+#define $from$(_str) ({                      \
+    $ c_res = alloca(strlen(_str) + 1);     \
+    strcpy(c_res, _str);                    \
+    c_res;                                  \
+})
+
+/// Inserts _add into the $ _str at _index
+/// @param _str : The base string
+/// @param _index : The index in _str for _add to be inserted at. This will be
+/// clamped between [0 and strLen+1].
+/// @param _add : The $ to be inserted
+/// @returns $ : A $ with the same contents as _str but with _add inserted.
+#define $insert(_str, _index, _add) ({                  \
+    $ i_res;                                            \
+    int index = _index;                                 \
+    int startLen = strlen(_str);                        \
+    int addLen = strlen(_add);                          \
+                                                        \
+    if(addLen == 0)                                     \
+    {                                                   \
+        i_res = $from("");                              \
+        goto end;                                       \
+    }                                                   \
+                                                        \
+    if(index > startLen)                                \
+    {                                                   \
+        index = startLen;                               \
+    }                                                   \
+                                                        \
+    if(index < 0)                                       \
+    {                                                   \
+        index = 0;                                      \
+    }                                                   \
+                                                        \
+    i_res = $resize(_str, startLen + addLen + 1);       \
+                                                        \
+    int rightSize = (startLen - index);                 \
+    $ tmp = alloca(rightSize + 1);                      \
+                                                        \
+    memcpy(tmp, _str + index, rightSize + 1);           \
+    memcpy(i_res + (index + addLen), tmp, rightSize);   \
+    memcpy(i_res + index, _add, addLen);                \
+                                                        \
+    end:                                                \
+    i_res[startLen + addLen] = '\0';                    \
+    i_res;                                              \
 })
 
 /// Takes a substring of a $ from start with len

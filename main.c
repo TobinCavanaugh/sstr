@@ -3,13 +3,14 @@
 #include "sw.h"
 #include "sstr.h"
 
-int main() {
 
+int main()
+{
     $ path = "C:\\users\\tobinc\\";
 
-    path = $insert(path, 0, "test\\");
+    $ other = $from$(path);
 
-    printf("%s\n", path);
+    printf("%s-%s\n", path, other);
 
     return 1;
 }
