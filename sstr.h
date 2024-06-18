@@ -69,15 +69,6 @@
     a_res;                                  \
 })
 
-/// Creates a $ from another $
-/// @param _str : The $ to be copied
-/// @returns $ : The newly created $
-#define $from$(_str) ({                      \
-    $ c_res = alloca(strlen(_str) + 1);     \
-    strcpy(c_res, _str);                    \
-    c_res;                                  \
-})
-
 /// Inserts _add into the $ _str at _index
 /// @param _str : The base string
 /// @param _index : The index in _str for _add to be inserted at. This will be
@@ -93,7 +84,7 @@
     if(addLen == 0)                                     \
     {                                                   \
         i_res = $from("");                              \
-        goto end;                                       \
+        i_res;                                          \
     }                                                   \
                                                         \
     if(index > startLen)                                \
@@ -115,10 +106,11 @@
     memcpy(i_res + (index + addLen), tmp, rightSize);   \
     memcpy(i_res + index, _add, addLen);                \
                                                         \
-    end:                                                \
     i_res[startLen + addLen] = '\0';                    \
     i_res;                                              \
 })
+
+#define LINE __LINE__
 
 /// Takes a substring of a $ from start with len
 /// @param a : The base $
@@ -137,14 +129,14 @@
                                             \
     if(len <= 0){                           \
         s_res = $from("");                  \
-        goto slice_done;                    \
+        s_res;                              \
     }                                       \
                                             \
     while(start + len > alen){              \
         len--;                              \
         if(len <= 0){                       \
             s_res = $from("");              \
-            goto slice_done;                \
+            s_res;                          \
         }                                   \
     }                                       \
                                             \
@@ -153,7 +145,6 @@
     memcpy(s_res, a + start, len);          \
     s_res[len] = '\0';                      \
                                             \
-    slice_done:                             \
     s_res;                                  \
 })
 
