@@ -5,6 +5,11 @@
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
 
+#include <stdlib.h>
+#include <memory.h>
+#include <string.h>
+#include <stdint.h>
+
 #define $ char *
 
 /// Manually allocates stack memory for your string
@@ -64,7 +69,17 @@
     a_res;                                  \
 })
 
-/// Takes a substring of a from start with len
+/// Inserts _str into $ _base at _index
+#define $insert(_base, _index, _str) ({ \
+    int blen = strlen(_base);           \
+    int slen = strlen(_str);            \
+    $ i_res = alloca(blen + slen + 1);  \
+    /*TODO IMPLEMENT*/                                \
+    strcpy(i_res, _base);               \
+    strcpy(i_res + _index, _str);\
+})
+
+/// Takes a substring of a $ from start with len
 /// @param a : The base $
 /// @param _start : The start index
 /// @param _len : The length of the substring
