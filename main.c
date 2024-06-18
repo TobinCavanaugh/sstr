@@ -1,48 +1,25 @@
 #include <stdio.h>
-#include <dirent.h>
-
-#include "sw.h"
 #include "sstr.h"
+#include "sw.h"
 
+#define $begin(a) int __run_ ## a(){
+
+#define $end(a) } __run_ ## a ();
 
 int main()
 {
-    char path[255] = {0};
-    getcwd(path, 255);
+    double us = sw_start_us();
 
-    DIR* dir;
-    struct dirent* ent;
-    if ((dir = opendir(path)) != NULL)
+    int i = 100000;
+    for (; i >= 0; i--)
     {
-        /* print all the files and directories within directory */
-        while ((ent = readdir(dir)) != NULL)
-        {
-            $ entry = $from(ent->d_name);
-            $ fullPath = $append_fmt(path, "\\%s", ent->d_name);
-
-            DWORD attributes = GetFileAttributesA(fullPath);
-            if (attributes != INVALID_FILE_ATTRIBUTES)
-            {
-                if (attributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    entry = $insert(fullPath, 0, "#| ");
-                }
-                else
-                {
-                    entry = $insert(fullPath, 0, "F| ");
-                }
-            }
-
-            printf("%s\n", entry);
-        }
-        closedir(dir);
-    }
-    else
-    {
-        /* could not open directory */
-        perror("");
-        return EXIT_FAILURE;
+        $begin(a)
+            $ a = $from("Hello");
+            a = $append(a, " World!");
+        $end(a)
     }
 
-    return 1;
+    sw_print_us(us);
+
+    return 0;
 }

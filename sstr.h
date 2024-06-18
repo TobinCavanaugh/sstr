@@ -64,8 +64,8 @@
     int alen = strlen(a);                   \
     int blen = strlen(b);                   \
     $ a_res = $resize(a, alen + blen + 1);  \
-    memcpy(a_res, a, alen);                 \
-    memcpy(a_res + alen, b, blen + 1);      \
+    strcpy(a_res, a);                       \
+    strcpy(a_res + alen, b);                \
     a_res;                                  \
 })
 
@@ -75,46 +75,50 @@
 /// clamped between [0 and strLen+1].
 /// @param _add : The $ to be inserted
 /// @returns $ : A $ with the same contents as _str but with _add inserted.
-#define $insert(_str, _index, _add) ({                  \
-    $ i_res;                                            \
-    int index = _index;                                 \
-    int startLen = strlen(_str);                        \
-    int addLen = strlen(_add);                          \
-                                                        \
-    if(addLen == 0)                                     \
-    {                                                   \
-        i_res = $from("");                              \
-        i_res;                                          \
-    }                                                   \
-                                                        \
-    if(index > startLen)                                \
-    {                                                   \
-        index = startLen;                               \
-    }                                                   \
-                                                        \
-    if(index < 0)                                       \
-    {                                                   \
-        index = 0;                                      \
-    }                                                   \
-                                                        \
-    i_res = $resize(_str, startLen + addLen + 1);       \
-                                                        \
-    int rightSize = (startLen - index);                 \
-    $ tmp = alloca(rightSize + 1);                      \
-                                                        \
-    memcpy(tmp, _str + index, rightSize + 1);           \
-    memcpy(i_res + (index + addLen), tmp, rightSize);   \
-    memcpy(i_res + index, _add, addLen);                \
-                                                        \
-    i_res[startLen + addLen] = '\0';                    \
-    i_res;                                              \
+#define $insert(_str, _index, _add) ({                      \
+    $ i_res;                                                \
+    int index = _index;                                     \
+    int startLen = strlen(_str);                            \
+    int addLen = strlen(_add);                              \
+                                                            \
+    if(addLen == 0)                                         \
+    {                                                       \
+        i_res = $from("");                                  \
+        i_res;                                              \
+    }                                                       \
+                                                            \
+    if(index > startLen)                                    \
+    {                                                       \
+        index = startLen;                                   \
+    }                                                       \
+                                                            \
+    if(index < 0)                                           \
+    {                                                       \
+        index = 0;                                          \
+    }                                                       \
+                                                            \
+    i_res = $resize(_str, startLen + addLen + 1);           \
+                                                            \
+    {                                                       \
+        int rightSize = (startLen - index);                 \
+        $ tmp = alloca(rightSize + 1);                      \
+                                                            \
+        memcpy(tmp, _str + index, rightSize + 1);           \
+        memcpy(i_res + (index + addLen), tmp, rightSize);   \
+        memcpy(i_res + index, _add, addLen);                \
+    }                                                       \
+                                                            \
+    i_res[startLen + addLen] = '\0';                        \
+    i_res;                                                  \
 })
 
 #define LINE __LINE__
 
 /// Takes a substring of a $ from start with len
 /// @param a : The base $
-/// @param _start : The start index
+/// @param _start : The start index. In the case this is negative, the negative
+/// numbers will be subtracted from length. This means that an index of -1 and
+/// a length of 3 will result in the first 2 characters being read.
 /// @param _len : The length of the substring
 #define $substr(a, _start, _len) ({         \
     int alen = strlen(a);                   \

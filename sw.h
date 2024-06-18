@@ -235,7 +235,7 @@ inline void sw_memory_print_auto() {
     }
 }
 
-#endif SW_MEMORY
+#endif //SW_MEMORY
 
 #endif //STOPWATCH_H
 
