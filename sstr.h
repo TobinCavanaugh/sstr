@@ -12,6 +12,12 @@
 
 #define $ char *
 
+
+/// Used with conjunction with $end
+#define $begin(NAME) void __run_ ## NAME (void){
+
+#define $end(NAME) } __run_ ## NAME ();
+
 /// Manually allocates stack memory for your string
 /// @param a : The source C string literal
 /// @returns $ : The newly created $
@@ -160,6 +166,13 @@
     char * new = malloc(len + 1);   \
     memcpy(new, a, len + 1);        \
     new;                            \
+})
+
+#define $stackify(a) ({         \
+    int len = strlen(a);        \
+    char * new = alloca(len);   \
+    memcpy(new, a, len + 1);    \
+    new;                        \
 })
 
 #endif //SSTR_SSTR_H
