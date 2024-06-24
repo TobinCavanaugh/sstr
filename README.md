@@ -13,11 +13,12 @@ $ a = $from("Hello");
 a = $append(a, " World!");
 printf("%s\n", a);
 ```
+`>Hello World!`
 
 Loop Example:
-> We use the $begin(NAME) and $end(NAME) in order to create a stack frame as scoped blocks don't 'free' stack allocated memory.
+> We use the $begin(NAME) and $end(NAME) in order to create a stack frame as scoped blocks don't 'free' stack allocated memory. This functionality relies on GCCs nested function extension.
 ```C
-int i = 5;
+int i = 10000;
 for (; i >= 0; i--) {
   $begin(a)
     $ a = $from_fmt("%d", i);
@@ -25,3 +26,6 @@ for (; i >= 0; i--) {
   $end(a)
 }
 ```
+`>10000`
+`>9999`
+`...`
