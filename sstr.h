@@ -1,6 +1,7 @@
 //
 // Created by tobin on 6/17/2024.
 //
+/// \file
 
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
@@ -10,12 +11,20 @@
 #include <string.h>
 #include <stdint.h>
 
+/// Definition for a string. Highly recommended to limit its use to
+/// only stack strings for the sake of your sanity.
 #define $ char *
 
-
-/// Used with conjunction with $end
+/// Used with combination with $end(1). Creates a nested function
+/// as to allow arena allocation like behavior. Use $realize to
+/// convert a stack $ to a heap string.
+/// @param NAME : Unique name to link with $end
+/// @returns void
 #define $begin(NAME) void __run_ ## NAME (void){
 
+/// Used in combination with $begin(1)
+/// @param NAME : Unique name to link with $begin
+/// @returns void
 #define $end(NAME) } __run_ ## NAME ();
 
 /// Manually allocates stack memory for your string
@@ -118,14 +127,13 @@
     i_res;                                                  \
 })
 
-#define LINE __LINE__
-
 /// Takes a substring of a $ from start with len
 /// @param a : The base $
 /// @param _start : The start index. In the case this is negative, the negative
 /// numbers will be subtracted from length. This means that an index of -1 and
 /// a length of 3 will result in the first 2 characters being read.
-/// @param _len : The length of the substring
+/// @param _len : The length of the substringa
+/// @returns $ : The resulting substring as a stack string
 #define $substr(a, _start, _len) ({         \
     int alen = strlen(a);                   \
     int len = _len;                         \
@@ -159,7 +167,7 @@
 })
 
 /// Creates a heap allocated string from the $
-/// @param a : The $ to be converted
+/// @param a : The $ to be allocated
 /// @returns char * : A char pointer to the newly allocated string
 #define $realize(a) ({              \
     int len = strlen(a);            \
@@ -168,9 +176,12 @@
     new;                            \
 })
 
+/// Creates a stack allocated string from the $
+/// @param a : The $ to be allocated
+/// @returns $ : The stack string
 #define $stackify(a) ({         \
     int len = strlen(a);        \
-    char * new = alloca(len);   \
+    $ new = alloca(len);        \
     memcpy(new, a, len + 1);    \
     new;                        \
 })

@@ -23,11 +23,12 @@ void PrintThing(int x, float y, $ z) {
     //Insert a pipe character between the two strings
     working = $insert(working, strlen(working), " | ");
 
-    printf("%s", working);
+//    printf("%s", working);
 }
 
 int main() {
     double us = sw_start_us();
+
 
     int i = 1000000;
     for (; i >= 0; i--) {
