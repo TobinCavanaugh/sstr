@@ -1,6 +1,7 @@
 # sstr.h 
 
 ### A stack based dynamic string allocation library
+Documentation at: https://tobincavanaugh.github.io/sstr/
 
 #### Why use `sstr.h`?
 1. No more manual freeing and allocating of temporary working strings.
