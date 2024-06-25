@@ -7,7 +7,9 @@ Documentation at: https://tobincavanaugh.github.io/sstr/
 1. No more manual freeing and allocating of temporary working strings.
 2. No worry about buffer overflows in the case of doing fixed size buffers with libC string functions.
 3. Macro based for no additional function calls.
-4. Significantly faster than stack allocation, without the chance for memory leaks.
+4. Significantly faster than heap allocation, without the chance for memory leaks.
+
+The only reason NOT to use `sstr.h` in your project is if you have a limited stack size.
 
 #### Hello World Example:
 ```C
@@ -22,10 +24,10 @@ printf("%s\n", a);
 ```C
 int i = 10000;
 for (; i >= 0; i--) {
-  $begin(a)
+  $begin(forloop)
     $ a = $from_fmt("%d", i);
     printf("%s\n", a);
-  $end(a)
+  $end(forloop)
 }
 ```
 `>10000`
@@ -53,13 +55,13 @@ void PrintThing(int x, float y, $ z) {
     //Remove newline at the end
     working[strlen(working) - 1] = '\0';
 
-    //Append our values string
-    working = $append(working, str);
-
     //Insert a pipe character between the two strings
     working = $insert(working, strlen(working), " | ");
-
-    printf("%s", working);
+    
+    //Append our values string
+    working = $append(working, str);
+    
+    printf("%s\n", working);
 }
 
 int main() {
@@ -70,3 +72,5 @@ int main() {
 }
 
 ```
+`>Tue Jun 25 10:36:42 2024 | 100, 0.500000, String`
+`...`
