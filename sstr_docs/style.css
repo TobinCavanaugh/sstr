@@ -1,0 +1,145 @@
+
+.eb-garamond {
+    font-family: "EB Garamond", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+*, html {
+    background-color: #161616;
+    color: floralwhite;
+    font-weight: normal;
+    font-family: "EB Garamond", serif;
+}
+
+
+.article {
+    background-color: #161616;
+    margin-left: 6em;
+    margin-right: 6em;
+}
+
+.textblock {
+    padding-left: 1rem;
+    border: solid #202020;
+    /*background-color: #1D1D1D;*/
+}
+
+
+.groupheader {
+    font-size: x-large;
+    background-color: #1D1D1D;
+    flex-flow: column;
+}
+
+.memItemLeft {
+    /*padding-left: 4rem;*/
+    padding-top: 0;
+    padding-bottom: 0;
+    border: 0px;
+}
+
+.memberdecls {
+    border: solid #202020;
+}
+
+.include {
+    color: lightsalmon;
+}
+
+.file {
+    color: lightgreen;
+}
+
+.comment {
+    color: lightgreen;
+}
+
+.memItemLeft {
+    color: lightsalmon;
+}
+
+#projectrow {
+    font-size: x-large;
+}
+
+#projectname {
+    padding-left: 1rem;
+}
+#projectbrief {
+    font-size: medium;
+    margin-left: 1rem;
+}
+
+#projecturl {
+    font-size: small;
+    margin-left: 1rem;
+}
+.groupheader {
+    padding: 0px;
+    margin: 0px;
+}
+
+
+
+.memitem {
+    padding-left: 4rem;
+    border: solid #202020;
+}
+
+.memproto {
+    display: none;
+}
+
+.memSeparator {
+    height: 1px !important;
+    display: block;
+}
+
+.paramname {
+    color: lightblue;
+    background-color: #2B2B2B;
+    text-align: center;
+    vertical-align: top;
+}
+
+.paramname::before, .paramname::after, .ret {
+    content: "  ";
+    white-space: pre;
+}
+
+.definition {
+    display: none;
+}
+
+.paramtitle, .rettitle {
+    color: lightsalmon;
+}
+
+.paramdesc {
+    color: lightgreen;
+}
+
+.memtitle .permalink {
+    user-select: none;
+}
+
+.memtitle .permalink::before {
+    white-space: pre;
+    content: " [";
+    background-color: #202020 !important;
+}
+
+.memtitle .permalink::after {
+    white-space: pre;
+    content: "] ";
+    background-color: #202020 !important;
+}
+
+.memtitle, .memtitle a {
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    background-color: #202020 !important;
+}
