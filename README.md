@@ -70,7 +70,3 @@ int main() {
 }
 
 ```
-
-
-## sstr.h
-<img width=200em src="https://github.com/TobinCavanaugh/sstr/blob/master/logo/logo.png?raw=true"/>
