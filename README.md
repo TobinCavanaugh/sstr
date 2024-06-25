@@ -9,7 +9,8 @@ Documentation at: https://tobincavanaugh.github.io/sstr/
 3. Macro based for no additional function calls.
 4. Significantly faster than heap allocation, without the chance for memory leaks.
 
-The only reason NOT to use `sstr.h` in your project is if you have a limited stack size.
+#### Why not to use `sstr.h`
+1. Limited stack size: `sstr.h` cannot take into account the space remaining in the stack, so irresponsible use can cause a stack overflow.
 
 #### Hello World Example:
 ```C
