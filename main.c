@@ -17,13 +17,13 @@ void PrintThing(int x, float y, $ z) {
     //Remove newline at the end
     working[strlen(working) - 1] = '\0';
 
-    //Append our values string
-    working = $append(working, str);
-
     //Insert a pipe character between the two strings
     working = $insert(working, strlen(working), " | ");
 
-//    printf("%s", working);
+    //Append our values string
+    working = $append(working, str);
+
+    printf("%s\n", working);
 }
 
 int main() {
