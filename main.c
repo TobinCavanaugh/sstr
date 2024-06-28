@@ -23,7 +23,7 @@ void PrintThing(int x, float y, $ z) {
     //Append our values string
     working = $append(working, str);
 
-    printf("%s\n", working);
+//    printf("%s\n", working);
 }
 
 int main() {
