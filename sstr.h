@@ -3,20 +3,18 @@
 //
 /// \file
 
+#include "../mem/salloc.h"
+#include "../str/str.h"
+
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
-
-#include <stdlib.h>
-#include <memory.h>
-#include <string.h>
-#include <stdint.h>
 
 /// Definition for a string. Highly recommended to limit its use to
 /// only stack strings for the sake of your sanity.
 #define $ char *
 
 /// Used with combination with $end(1). Creates a nested function
-/// as to allow arena allocation like behavior. Use $realize to
+/// as to allow arena salloction like behavior. Use $realize to
 /// convert a stack $ to a heap string.
 /// @param NAME : Unique name to link with $end
 /// @returns void
@@ -27,13 +25,14 @@
 /// @returns void
 #define $end(NAME) } __run_ ## NAME ();
 
-/// Manually allocates stack memory for your string
+/// Manually salloctes stack memory for your string
 /// @param a : The source C string literal
 /// @returns $ : The newly created $
 #define $from(a) ({                     \
-    int len = strlen(a);                \
-    char* f_new = alloca(len + 1);      \
-    memcpy(f_new, a, len + 1);          \
+    char * tmp = a;                     \
+    u64 len = str_len(tmp);             \
+    $ f_new = salloc(len + 1);          \
+    mem_copy(f_new, tmp, len + 1);      \
     f_new;                              \
 })
 
@@ -41,22 +40,24 @@
 /// @param a : The base $ to be resized
 /// @param size : The size of the new $
 /// @returns $ : The new $
-#define $resize(a, size) ({           \
-    char * r_res = alloca(size);      \
-    memcpy(r_res, a, strlen(a) + 1);  \
-    r_res;                            \
+#define $resize(a, size) ({                     \
+    char * atmp = a;                            \
+    char * r_res = salloc(size);                \
+    mem_copy(r_res, atmp, str_len(atmp) + 1);   \
+    r_res;                                      \
 })
 
 /// Creates a $ from a C printf style format and args.
 /// @param fmt : The format to create the string from
 /// @param ... : The varargs to fill into the format
 /// @returns $ : A $ of the correct formatting
-#define $from_fmt(fmt, ...) ({                      \
-  /*Calculate length of string*/                    \
-  int flen = snprintf(NULL, 0, fmt, __VA_ARGS__);   \
-  char *f_res = alloca(flen + 1);                   \
-  sprintf(f_res, fmt, __VA_ARGS__);                 \
-  f_res;                                            \
+#define $from_fmt(fmt, ...) ({                          \
+  char * tmpfmt = fmt;                                  \
+  /*Calculate length of string*/                        \
+  u64 flen = snprintf(NULL, 0, tmpfmt, __VA_ARGS__);    \
+  char *f_res = salloc(flen + 1);                       \
+  sprintf(f_res, tmpfmt, __VA_ARGS__);                  \
+  f_res;                                                \
 })
 
 /// Appends the arguments formatted to fmt to the base. Uses the standard
@@ -75,26 +76,31 @@
 /// @param a : The base $
 /// @param b : The $ to be appended
 /// @returns $ : The resulting combined string
-#define $append(a, b) ({                    \
-    int alen = strlen(a);                   \
-    int blen = strlen(b);                   \
-    $ a_res = $resize(a, alen + blen + 1);  \
-    strcpy(a_res, a);                       \
-    strcpy(a_res + alen, b);                \
-    a_res;                                  \
+#define $append(a, b) ({                        \
+    char * base = a;                            \
+    char * add = b;                             \
+    u64 alen = str_len(base);                   \
+    u64 blen = str_len(add);                    \
+    $ a_res = $resize(base, alen + blen + 1);   \
+    str_copy(a_res, base);                      \
+    str_copy(a_res + alen, add);                \
+    a_res;                                      \
 })
 
 /// Inserts _add into the $ _str at _index
-/// @param _str : The base string
+/// @param baseStr : The base string
 /// @param _index : The index in _str for _add to be inserted at. This will be
-/// clamped between [0 and strLen+1].
-/// @param _add : The $ to be inserted
+/// clamped between [0 and str_len+1].
+/// @param addStr : The $ to be inserted
 /// @returns $ : A $ with the same contents as _str but with _add inserted.
-#define $insert(_str, _index, _add) ({                      \
-    $ i_res;                                                \
-    int index = _index;                                     \
-    int startLen = strlen(_str);                            \
-    int addLen = strlen(_add);                              \
+#define $insert(baseStr, _index, addStr) ({                 \
+    $ i_res = $from("");                                    \
+    char * _str = baseStr;                                  \
+    char * _add = addStr;                                   \
+                                                            \
+    u64 index = _index;                                     \
+    u64 startLen = str_len(_str);                           \
+    u64 addLen = str_len(_add);                             \
                                                             \
     if(addLen == 0)                                         \
     {                                                       \
@@ -112,15 +118,15 @@
         index = 0;                                          \
     }                                                       \
                                                             \
-    i_res = $resize(_str, startLen + addLen + 1);           \
+    i_res = $resize(_str, startLen + addLen + 1 + 10);      \
                                                             \
     {                                                       \
-        int rightSize = (startLen - index);                 \
-        $ tmp = alloca(rightSize + 1);                      \
+        u64 rightSize = (startLen - index);                 \
+        $ tmp = salloc(rightSize + 1);                      \
                                                             \
-        memcpy(tmp, _str + index, rightSize + 1);           \
-        memcpy(i_res + (index + addLen), tmp, rightSize);   \
-        memcpy(i_res + index, _add, addLen);                \
+        mem_copy(tmp, _str + index, rightSize + 1);         \
+        mem_copy(i_res + (index + addLen), tmp, rightSize); \
+        mem_copy(i_res + index, _add, addLen);              \
     }                                                       \
                                                             \
     i_res[startLen + addLen] = '\0';                        \
@@ -128,16 +134,17 @@
 })
 
 /// Takes a substring of a $ from start with len
-/// @param a : The base $
+/// @param _base : The base $
 /// @param _start : The start index. In the case this is negative, the negative
 /// numbers will be subtracted from length. This means that an index of -1 and
 /// a length of 3 will result in the first 2 characters being read.
 /// @param _len : The length of the substringa
 /// @returns $ : The resulting substring as a stack string
-#define $substr(a, _start, _len) ({         \
-    int alen = strlen(a);                   \
-    int len = _len;                         \
-    int start = _start;                     \
+#define $substr(_base, _start, _len) ({     \
+    char *a = _base;                        \
+    u64 alen = str_len(a);                  \
+    u64 len = _len;                         \
+    u64 start = _start;                     \
     $ s_res = NULL;                         \
                                             \
     if(start < 0){                          \
@@ -158,32 +165,35 @@
         }                                   \
     }                                       \
                                             \
-    s_res = alloca(len + 1);                \
+    s_res = salloc(len + 1);                \
                                             \
-    memcpy(s_res, a + start, len);          \
+    mem_copy(s_res, a + start, len);          \
     s_res[len] = '\0';                      \
                                             \
     s_res;                                  \
 })
 
-/// Creates a heap allocated string from the $
-/// @param a : The $ to be allocated
-/// @returns char * : A char pointer to the newly allocated string
+/// Creates a heap sallocted string from the $
+/// @param a : The $ to be stack allocated
+/// @returns char * : A char pointer to the newly sallocted string
 #define $realize(a) ({              \
-    int len = strlen(a);            \
+    char * _a = a;                  \
+    u64 len = str_len(_a);          \
     char * new = malloc(len + 1);   \
-    memcpy(new, a, len + 1);        \
+    mem_copy(new, _a, len + 1);     \
     new;                            \
 })
 
-/// Creates a stack allocated string from the $
-/// @param a : The $ to be allocated
+/// Creates a stack sallocted string from the $
+/// @param a : The $ to be sallocted
 /// @returns $ : The stack string
-#define $stackify(a) ({         \
-    int len = strlen(a);        \
-    $ new = alloca(len);        \
-    memcpy(new, a, len + 1);    \
-    new;                        \
+#define $stackify(a) ({             \
+    char * _a = a;                  \
+    u64 len = str_len(_a);          \
+    $ new = salloc(len);            \
+    mem_copy(new, _a, len + 1);     \
+    new;                            \
 })
+
 
 #endif //SSTR_SSTR_H
