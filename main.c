@@ -2,7 +2,7 @@
 #include "sstr.h"
 #include "sw.h"
 
-void PrintThing(int x, float y, $ z) {
+void *PrintThing(int x, float y, $ z) {
     $ str = $from_fmt("%d, %f, %s", x, y, z);
 
     time_t rawtime;
@@ -23,16 +23,31 @@ void PrintThing(int x, float y, $ z) {
     //Append our values string
     working = $append(working, str);
 
-//    printf("%s\n", working);
+    return $realize(working);
 }
 
 int main() {
-    double us = sw_start_us();
 
+    $ tmp = $from("");
+    tmp = $append($append($append(tmp, "-"), "-"), "-");
+    tmp = $append_fmt($append_fmt(tmp, "%d", -1), "%d", -1);
+    tmp = $insert($insert(tmp, 0, "[O]"), 0, "[O]");
 
-    int i = 1000000;
+    tmp = $substr($substr(tmp, 0, 4), 0, 5);
+    printf("%s\n", tmp);
+
+    return 1;
+
+    char *res = $realize(tmp);
+    tmp = $stackify(res);
+
+    printf("%s\n", tmp);
+
+    int i = 10;
     for (; i >= 0; i--) {
-        PrintThing(100, .5f, "String");
+        char *res = PrintThing(100, .5f, "String");
+        printf("%s\n", res);
+        free(res);
     }
 
 //    int i = 5;
@@ -43,7 +58,6 @@ int main() {
 //        $end(a)
 //    }
 
-    sw_print_us(us);
 
     return 0;
 }
