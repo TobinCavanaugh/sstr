@@ -36,7 +36,7 @@ for (; i >= 0; i--) {
 `...`
 
 #### Complex Functionality Example:
-> This demonstrates the stack allocated nature and the speed of the operations we perform. Note the fact that there is no use of the `free` keyword, however the `i` value can be arbitrarily high without any concern of freeing. There is also no concern over buffer overruns, as all functions are designed to gracefully handle out of bounds indexing.
+> This demonstrates the stack allocated nature and the speed of the operations we perform. Note the fact that there is no use of the `free` function within PrintThing(), however the `i` value can be arbitrarily high without any concern of freeing. There is also no concern over buffer overruns, as all functions are designed to gracefully handle out of bounds indexing. The function `realize`s the stack string by placing it on the heap then returning that string, which we can print from our loop, then free the respective pointer.
 ```C
 #include <stdio.h>
 #include "sstr.h"
