@@ -41,7 +41,7 @@ for (; i >= 0; i--) {
 #include <stdio.h>
 #include "sstr.h"
 
-void PrintThing(int x, float y, $ z) {
+void *PrintThing(int x, float y, $ z) {
     $ str = $from_fmt("%d, %f, %s", x, y, z);
 
     time_t rawtime;
@@ -68,7 +68,9 @@ void PrintThing(int x, float y, $ z) {
 int main() {
     int i = 1000000;
     for (; i >= 0; i--) {
-        PrintThing(100, .5f, "String");
+        char * result = PrintThing(100, .5f, "String");
+        printf("%s\n", result);
+        free(result);
     }
 }
 
