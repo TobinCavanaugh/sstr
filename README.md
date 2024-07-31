@@ -41,7 +41,7 @@ for (; i >= 0; i--) {
 #include <stdio.h>
 #include "sstr.h"
 
-void *PrintThing(int x, float y, $ z) {
+char *PrintThing(int x, float y, $ z) {
     $ str = $from_fmt("%d, %f, %s", x, y, z);
 
     time_t rawtime;
@@ -61,8 +61,8 @@ void *PrintThing(int x, float y, $ z) {
     
     //Append our values string
     working = $append(working, str);
-    
-    printf("%s\n", working);
+
+    return $realize(working);
 }
 
 int main() {
