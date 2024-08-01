@@ -1,4 +1,22 @@
 /* Notes:
+ * Current stability : 8/10
+ * WARNING: alloca allocations are not validated in any way. apparently the
+ *          POSIX way is to fall basck on malloc for this, which is awesome
+ *          because it's harder to validate than NULL and also means that
+ *          you can get some hard to fix memory leaks. :)
+ * TODO: I'd really like to have this be character format agnostic, at least
+ * by allowing for local redefining of strlen and that sorta thing...
+ *
+ * 2024-08-01 | Tobin Cavanaugh | ----------------------------------------------
+ * [X]: I really should have better comments and error handling in the code.
+ * Did a huge pass of error fixes and adding tests. Still trying to avoid
+ * using the term 'bug', because that implies the computer is at fault... which
+ * is rarely true in C. The error pass caught a bunch of stuff, and also
+ * brought me to add the macro/function strnoe (string null or empty) which
+ * returns 1 if its null or empty, and 0 if its not. Sadly had to make this
+ * a statement expression, which I'd rather not do, but I have to cuz the
+ * potential for errors I talked about in the previous note.
+ *
  * 2024-07-31 | Tobin Cavanaugh | ---------------------------------------------
  * Realized recently I forgot to immediately memoize the arguments of the
  * macros. Whenever you're using macros its key to not re-use the same argument
@@ -20,6 +38,9 @@
 #include <string.h>
 #include <stdint.h>
 
+/// Returns 1 if the string is NULL or empty
+#define strnoe(_s_a) ({char * ss_a = _s_a; (ss_a == NULL || ss_a[0] == '\0');})
+
 #define SSTR_API __attribute__((unused))
 
 /// Definition for a string. Highly recommended to limit its use to
@@ -30,12 +51,10 @@
 /// as to allow arena allocation like behavior. Use $realize to
 /// convert a stack $ to a heap string.
 /// @param NAME : Unique name to link with $end
-/// @returns void
 #define $begin(NAME) void __run_ ## NAME (void){
 
 /// Used in combination with $begin(1)
 /// @param NAME : Unique name to link with $begin
-/// @returns void
 #define $end(NAME) } __run_ ## NAME ();
 
 /// Manually allocates stack memory for your string
@@ -44,10 +63,11 @@
 #define $from(_a) ({                        \
     $ f_a = _a;                             \
     int f_len = strlen(f_a);                \
-    char* f_new = alloca(f_len + 1);        \
+    $ f_new = ($) alloca(f_len + 1);        \
     memcpy(f_new, f_a, f_len + 1);          \
     f_new;                                  \
 })
+
 
 /// Creates a new $ with the corresponding size and matching data
 /// @param a : The base $ to be resized
@@ -94,15 +114,33 @@ SSTR_API static void internal_$append_helper($ a_res, $ a, int alen, $ b) {
 /// @param _a : The base $
 /// @param _b : The $ to be appended
 /// @returns $ : The resulting combined string
-#define $append(_a, _b) ({                            \
-    $ a_a = _a;                                       \
-    $ a_b = _b;                                       \
-    int a_alen = strlen(a_a);                         \
-    int a_blen = strlen(a_b);                         \
-    $ a_res = $resize(a_a, a_alen + a_blen + 1);      \
-    internal_$append_helper(a_res, a_a, a_alen, a_b); \
-                                                      \
-    a_res;                                            \
+#define $append(_a, _b) ({                                \
+    $ a_a = _a;                                           \
+    $ a_b = _b;                                           \
+                                                          \
+    $ a_res = NULL;                                       \
+                                                          \
+    /*Do our normal logic if both args are valid*/        \
+    if(!strnoe(a_a) && !strnoe(a_b)){                     \
+        int a_alen = strlen(a_a);                         \
+        int a_blen = strlen(a_b);                         \
+        a_res = $resize(a_a, a_alen + a_blen + 1);        \
+        internal_$append_helper(a_res, a_a, a_alen, a_b); \
+    }                                                     \
+    /*If _a is null, _b is our fallback*/                 \
+    if(strnoe(a_a) && !strnoe(a_b)){                      \
+        a_res = $from(a_b);                               \
+    }                                                     \
+    /*If _b is null, _a is our fallback*/                 \
+    if(strnoe(a_b) && !strnoe(a_a)){                      \
+        a_res = $from(a_a);                               \
+    }                                                     \
+    /*If both are NULL, "" is our fallback*/              \
+    if(strnoe(a_a) && strnoe(a_b)){                       \
+        a_res = "";                                       \
+    }                                                     \
+                                                          \
+    a_res;                                                \
 })
 
 SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
@@ -125,29 +163,44 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 /// clamped between [0 and strLen+1].
 /// @param add : The $ to be inserted
 /// @returns $ : A $ with the same contents as _str but with _add inserted.
-#define $insert(str, index, add) ({                                      \
-    $ i_str = str;                                                       \
-    $ i_add = add;                                                       \
-    $ i_res;                                                             \
-    int _index = index;                                                  \
-    int i_startLen = strlen(i_str);                                      \
-    int i_addLen = strlen(i_add);                                        \
-                                                                         \
-    if(_index > i_startLen) {                                            \
-        _index = i_startLen;                                             \
-    }                                                                    \
-                                                                         \
-    if(_index < 0) {                                                     \
-        _index = 0;                                                      \
-    }                                                                    \
-                                                                         \
-    i_res = $resize(i_str, i_startLen + i_addLen + 1);                   \
-                                                                         \
-    internal_$insert_helper(i_str, i_res, i_add,                         \
-                            _index, i_startLen, i_addLen);               \
-                                                                         \
-    i_res[i_startLen + i_addLen] = '\0';                                 \
-    i_res;                                                               \
+#define $insert(str, index, add) ({                            \
+    $ i_str = str;                                             \
+    $ i_add = add;                                             \
+    $ i_res;                                                   \
+    int _index = index;                                        \
+                                                               \
+    /*Do regular business logic*/                              \
+    if(!strnoe(i_str) && !strnoe(i_add)){                      \
+        int i_startLen = strlen(i_str);                        \
+        int i_addLen = strlen(i_add);                          \
+                                                               \
+        /*Cap our insert point within string bounds*/          \
+        if(_index > i_startLen) {                              \
+            _index = i_startLen;                               \
+        }                                                      \
+        if(_index < 0) {                                       \
+            _index = 0;                                        \
+        }                                                      \
+                                                               \
+        i_res = $resize(i_str, i_startLen + i_addLen + 1);     \
+        internal_$insert_helper(i_str, i_res, i_add,           \
+                                _index, i_startLen, i_addLen); \
+        i_res[i_startLen + i_addLen] = '\0';                   \
+    }                                                          \
+                                                               \
+    if(!strnoe(i_str) && strnoe(i_add)){                       \
+        i_res = $from(i_str);                                  \
+    }                                                          \
+                                                               \
+    if(strnoe(i_str) && !strnoe(i_add)){                       \
+        i_res = $from(i_add);                                  \
+    }                                                          \
+                                                               \
+    if(strnoe(i_str) && strnoe(i_add)){                        \
+        i_res = $from("");                                     \
+    }                                                          \
+                                                               \
+    i_res;                                                     \
 })
 
 /// Takes a substring of a $ from start with len
@@ -157,37 +210,43 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 /// a length of 3 will result in the first 2 characters being read.
 /// @param _len : The length of the substringa
 /// @returns $ : The resulting substring as a stack string
-#define $substr(_a, _start, _len) ({   \
-    $ s_a = _a;                        \
-    int s_alen = strlen(s_a);          \
-    int s_len = _len;                  \
-    int start = _start;                \
-    $ s_res = NULL;                    \
-                                       \
-    if(start < 0){                     \
-        s_len += start;                \
-        start = 0;                     \
-    }                                  \
-                                       \
-    if(s_len <= 0){                    \
-        s_res = $from("");             \
-        s_res;                         \
-    }                                  \
-                                       \
-    while(start + s_len > s_alen){     \
-        s_len--;                       \
-        if(s_len <= 0){                \
-            s_res = $from("");         \
-            s_res;                     \
-        }                              \
-    }                                  \
-                                       \
-    s_res = alloca(s_len + 1);         \
-                                       \
-    memcpy(s_res, s_a + start, s_len); \
-    s_res[s_len] = '\0';               \
-                                       \
-    s_res;                             \
+#define $substr(_a, _start, _len) ({                                         \
+    $ s_a = _a;                                                              \
+    int s_len = _len;                                                        \
+    int s_start = _start;                                                    \
+    $ s_res = NULL;                                                          \
+                                                                             \
+    /*If we need to do any substr at all*/                                   \
+    if(!strnoe(s_a) && s_len > 0){                                           \
+        int s_alen = strlen(s_a);                                            \
+        if(s_start < 0){                                                     \
+            s_len += s_start;                                                \
+            s_start = 0;                                                     \
+        }                                                                    \
+                                                                             \
+        /*Forgot what this is supposed to do, but iteration is sutpid here*/ \
+        while(s_start + s_len > s_alen){                                     \
+            s_len--;                                                         \
+        }                                                                    \
+                                                                             \
+        if(s_len > 0){                                                       \
+            s_res = alloca(s_len + 1);                                       \
+            memcpy(s_res, s_a + s_start, s_len);                             \
+            s_res[s_len] = '\0';                                             \
+        }  else {                                                            \
+            s_res = $from("");                                               \
+        }                                                                    \
+    }                                                                        \
+                                                                             \
+    if(s_len <= 0){                                                          \
+        s_res = $from("");                                                   \
+    }                                                                        \
+                                                                             \
+    if(strnoe(s_a)){                                                         \
+        s_res = $from("");                                                   \
+    }                                                                        \
+                                                                             \
+    s_res;                                                                   \
 })
 
 /// Creates a heap allocated string from the $
