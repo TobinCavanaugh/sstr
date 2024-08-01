@@ -14,6 +14,7 @@ Documentation at: https://tobincavanaugh.github.io/sstr/
 
 #### Hello World Example:
 ```C
+// Using $from is optional
 $ a = $from("Hello");
 a = $append(a, " World!");
 printf("%s\n", a);
