@@ -1,7 +1,7 @@
 /* Notes:
  * Current stability : 8/10
  * WARNING: alloca allocations are not validated in any way. apparently the
- *          POSIX way is to fall basck on malloc for this, which is awesome
+ *          POSIX way is to fall back on malloc for this, which is awesome
  *          because it's harder to validate than NULL and also means that
  *          you can get some hard to fix memory leaks. :)
  * TODO: I'd really like to have this be character format agnostic, at least
@@ -11,7 +11,7 @@
  * [X]: I really should have better comments and error handling in the code.
  * Did a huge pass of error fixes and adding tests. Still trying to avoid
  * using the term 'bug', because that implies the computer is at fault... which
- * is rarely true in C. The error pass caught a bunch of stuff, and also
+ * is rarely true in C. The error pass caught a bunch of stuff,  and also
  * brought me to add the macro/function strnoe (string null or empty) which
  * returns 1 if its null or empty, and 0 if its not. Sadly had to make this
  * a statement expression, which I'd rather not do, but I have to cuz the
@@ -60,12 +60,12 @@
 /// Manually allocates stack memory for your string
 /// @param _a : The source C string literal
 /// @returns $ : The newly created $
-#define $from(_a) ({                        \
-    $ f_a = _a;                             \
-    int f_len = strlen(f_a);                \
-    $ f_new = ($) alloca(f_len + 1);        \
-    memcpy(f_new, f_a, f_len + 1);          \
-    f_new;                                  \
+#define $from(_a) ({                 \
+    $ f_a = _a;                      \
+    int f_len = strlen(f_a);         \
+    $ f_new = ($) alloca(f_len + 1); \
+    memcpy(f_new, f_a, f_len + 1);   \
+    f_new;                           \
 })
 
 
@@ -210,43 +210,43 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 /// a length of 3 will result in the first 2 characters being read.
 /// @param _len : The length of the substringa
 /// @returns $ : The resulting substring as a stack string
-#define $substr(_a, _start, _len) ({                                         \
-    $ s_a = _a;                                                              \
-    int s_len = _len;                                                        \
-    int s_start = _start;                                                    \
-    $ s_res = NULL;                                                          \
-                                                                             \
-    /*If we need to do any substr at all*/                                   \
-    if(!strnoe(s_a) && s_len > 0){                                           \
-        int s_alen = strlen(s_a);                                            \
-        if(s_start < 0){                                                     \
-            s_len += s_start;                                                \
-            s_start = 0;                                                     \
-        }                                                                    \
-                                                                             \
-        /*Forgot what this is supposed to do, but iteration is sutpid here*/ \
-        while(s_start + s_len > s_alen){                                     \
-            s_len--;                                                         \
-        }                                                                    \
-                                                                             \
-        if(s_len > 0){                                                       \
-            s_res = alloca(s_len + 1);                                       \
-            memcpy(s_res, s_a + s_start, s_len);                             \
-            s_res[s_len] = '\0';                                             \
-        }  else {                                                            \
-            s_res = $from("");                                               \
-        }                                                                    \
-    }                                                                        \
-                                                                             \
-    if(s_len <= 0){                                                          \
-        s_res = $from("");                                                   \
-    }                                                                        \
-                                                                             \
-    if(strnoe(s_a)){                                                         \
-        s_res = $from("");                                                   \
-    }                                                                        \
-                                                                             \
-    s_res;                                                                   \
+#define $substr(_a, _start, _len) ({             \
+    $ s_a = _a;                                  \
+    int s_len = _len;                            \
+    int s_start = _start;                        \
+    $ s_res = NULL;                              \
+                                                 \
+    /*If we need to do any substr at all*/       \
+    if(!strnoe(s_a) && s_len > 0){               \
+        int s_alen = strlen(s_a);                \
+        if(s_start < 0){                         \
+            s_len += s_start;                    \
+            s_start = 0;                         \
+        }                                        \
+                                                 \
+        /*Prevent out of bounds accessing*/      \
+        while(s_start + s_len > s_alen){         \
+            s_len--;                             \
+        }                                        \
+                                                 \
+        if(s_len > 0){                           \
+            s_res = alloca(s_len + 1);           \
+            memcpy(s_res, s_a + s_start, s_len); \
+            s_res[s_len] = '\0';                 \
+        }  else {                                \
+            s_res = $from("");                   \
+        }                                        \
+    }                                            \
+                                                 \
+    if(s_len <= 0){                              \
+        s_res = $from("");                       \
+    }                                            \
+                                                 \
+    if(strnoe(s_a)){                             \
+        s_res = $from("");                       \
+    }                                            \
+                                                 \
+    s_res;                                       \
 })
 
 /// Creates a heap allocated string from the $
@@ -254,6 +254,9 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 /// @returns char * : A char pointer to the newly allocated string
 #define $realize(_a) ({           \
     $ rel_a = _a;                 \
+    if(strnoe(_a)){               \
+        rel_a = "";               \
+    }                             \
     int len = strlen(rel_a);      \
     char * new = malloc(len + 1); \
     memcpy(new, rel_a, len + 1);  \
@@ -265,6 +268,11 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 /// @returns $ : The stack string
 #define $stackify(_a) ({        \
     $ st_a = _a;                \
+                                \
+    if(strnoe(_a)){             \
+        st_a = "";              \
+    }                           \
+                                \
     int len = strlen(st_a);     \
     $ new = alloca(len);        \
     memcpy(new, st_a, len + 1); \

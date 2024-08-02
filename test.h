@@ -11,6 +11,8 @@
 
 #include "tests/test_append.h"
 #include "tests/test_insert.h"
+#include "tests/test_realize.h"
+#include "tests/test_stackify.h."
 #include "tests/test_substr.h"
 
 
@@ -35,6 +37,21 @@ void test_all() {
     printf("%d  ", test_$insert_6());
     printf("%d  ", test_$insert_7());
 
+    printf("\n");
+
+    printf("Realize     Tests:  ");
+
+    printf("%d  ", test_$realize_0());
+    printf("%d  ", test_$realize_1());
+    printf("%d  ", test_$realize_2());
+
+    printf("\n");
+
+    printf("Stackify    Tests:  ");
+
+    printf("%d  ", test_$stackify_0());
+    printf("%d  ", test_$stackify_1());
+    printf("%d  ", test_$stackify_2());
     printf("\n");
 
     printf("Substring   Tests:  ");
