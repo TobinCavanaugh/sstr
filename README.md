@@ -1,6 +1,6 @@
 # sstr.h 
 
-### A stack based dynamic string library
+### A stack based dynamic string modification library
 Documentation at: https://tobincavanaugh.github.io/sstr/
 
 #### Why use `sstr.h`?
