@@ -1,6 +1,6 @@
 # sstr.h 
 
-### A stack based dynamic string allocation library
+### A stack based dynamic string library
 Documentation at: https://tobincavanaugh.github.io/sstr/
 
 #### Why use `sstr.h`?
