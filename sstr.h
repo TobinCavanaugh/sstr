@@ -9,6 +9,14 @@
  * TODO: I'd really like to have this be character format agnostic, at least
  * by allowing for local redefining of strlen and that sorta thing...
  *
+ * 2024-08-04 | Tobin Cavanaugh | ----------------------------------------------
+ * Favorite thing in the world is happening, -O3 causes insert to not work
+ * properly. I guess I should count myself lucky that that's the only one thats
+ * breaking. The tests have already paid themselves off ten-fold. Shockingly
+ * this took me like 10 minutes to fix. Having functions that handle the memcpy
+ * and dangerous stuff makes debugging 1,000,000x easier, this should be
+ * standard behavior most of the time.
+ *
  * 2024-08-01 | Tobin Cavanaugh | ----------------------------------------------
  * [X]: I really should have better comments and error handling in the code.
  * Did a huge pass of error fixes and adding tests. Still trying to avoid
@@ -35,12 +43,13 @@
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
 
-#define sstr_alloca(size) ({char * ptr = (char*) __builtin_alloca(size); ptr;})
-
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
 #include <stdint.h>
+
+//#define sstr_alloca(size) ({char * ptr = (char*) __builtin_alloca(size); ptr;})
+#define sstr_alloca(size) ({ char * a_x = (char*) alloca(size); a_x;})
 
 /// Returns 1 if the string is NULL or empty
 #define strnoe(_s_a) ({char * ss_a = _s_a; (ss_a == NULL || ss_a[0] == '\0');})
@@ -165,6 +174,10 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
      * Could probably use memmove for this, but im lazy and moving this
      * looks scary
      */
+
+    /*Copy in our default content, this caused a little bug but thanks to this
+     * being in a function it was super easy to debug. */
+    memcpy(i_res, _str, startLen);
 
     /*Grab the content to the right of our index and put it into our tmp*/
     memcpy(tmp, _str + index, rightSize + 1);

@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_sstr: phony || CMakeFiles/sstr.dir
 
 build CMakeFiles/sstr.dir/main.c.obj: C_COMPILER__sstr_Debug C$:/Users/tobin/CLionProjects/sstr/main.c || cmake_object_order_depends_target_sstr
   DEP_FILE = CMakeFiles\sstr.dir\main.c.obj.d
-  FLAGS = -g -Wall -fstack-protector-all -fdiagnostics-color=always -std=gnu90
+  FLAGS = -g -Wall -fstack-protector-all -O3 -fdiagnostics-color=always -std=gnu90
   OBJECT_DIR = CMakeFiles\sstr.dir
   OBJECT_FILE_DIR = CMakeFiles\sstr.dir
 
@@ -64,7 +64,7 @@ build CMakeFiles/sstr.dir/main.c.obj: C_COMPILER__sstr_Debug C$:/Users/tobin/CLi
 # Link the executable sstr.exe
 
 build sstr.exe: C_EXECUTABLE_LINKER__sstr_Debug CMakeFiles/sstr.dir/main.c.obj
-  FLAGS = -g -Wall -fstack-protector-all
+  FLAGS = -g -Wall -fstack-protector-all -O3
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\sstr.dir
   POST_BUILD = cd .
