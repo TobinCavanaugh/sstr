@@ -33,6 +33,8 @@
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
 
+#define sstr_alloca(size) ({char * ptr = (char*) __builtin_alloca(size); ptr;})
+
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
@@ -41,6 +43,7 @@
 /// Returns 1 if the string is NULL or empty
 #define strnoe(_s_a) ({char * ss_a = _s_a; (ss_a == NULL || ss_a[0] == '\0');})
 
+/// Basic macro for preventing IDE/compiler from yelling at me
 #define SSTR_API __attribute__((unused))
 
 /// Definition for a string. Highly recommended to limit its use to
@@ -60,22 +63,27 @@
 /// Manually allocates stack memory for your string
 /// @param _a : The source C string literal
 /// @returns $ : The newly created $
-#define $from(_a) ({                 \
-    $ f_a = _a;                      \
-    int f_len = strlen(f_a);         \
-    $ f_new = ($) alloca(f_len + 1); \
-    memcpy(f_new, f_a, f_len + 1);   \
-    f_new;                           \
+#define $from(_a) ({                        \
+    $ f_a = _a;                             \
+    $ f_new = "";                           \
+    if(f_a != NULL){                        \
+        int f_len = strlen(f_a);            \
+        f_new = ($) sstr_alloca(f_len + 1); \
+        memcpy(f_new, f_a, f_len + 1);      \
+    }                                       \
+    f_new;                                  \
 })
 
 
-/// Creates a new $ with the corresponding size and matching data
-/// @param a : The base $ to be resized
+/// Creates a new $ with the corresponding size and matching data.
+/// This is primarily an internal function, and does not handle NULL
+/// safety. Thus its use should be avoided.
+/// @param r_a : The base $ to be resized
 /// @param size : The size of the new $
 /// @returns $ : The new $
 #define $resize(r_a, size) ({              \
     $ re_a = r_a;                          \
-    char * r_res = alloca(size);           \
+    char * r_res = sstr_alloca(size);      \
     memcpy(r_res, re_a, strlen(re_a) + 1); \
     r_res;                                 \
 })
@@ -88,7 +96,7 @@
     char * fmt = _fmt;                              \
     /*Calculate length of string*/                  \
     int flen = snprintf(NULL, 0, fmt, __VA_ARGS__); \
-    char *f_res = alloca(flen + 1);                 \
+    char *f_res = sstr_alloca(flen + 1);            \
     sprintf(f_res, fmt, __VA_ARGS__);               \
     f_res;                                          \
 })
@@ -146,14 +154,20 @@ SSTR_API static void internal_$append_helper($ a_res, $ a, int alen, $ b) {
 SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
                                              int index, int startLen, int addLen) {
     int rightSize = (startLen - index);
-    $ tmp = alloca(rightSize + 1);
+    $ tmp = sstr_alloca(rightSize + 1);
 
     /*
      * Could probably use memmove for this, but im lazy and moving this
      * looks scary
      */
+
+    /*Grab the content to the right of our index and put it into our tmp*/
     memcpy(tmp, _str + index, rightSize + 1);
+
+    /*Place that grabbed temporary string and place it at the end of our str*/
     memcpy(i_res + (index + addLen), tmp, rightSize);
+
+    /*Place our addstring in the center, overwriting the old content*/
     memcpy(i_res + index, _add, addLen);
 }
 
@@ -182,7 +196,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
             _index = 0;                                        \
         }                                                      \
                                                                \
-        i_res = $resize(i_str, i_startLen + i_addLen + 1);     \
+        i_res = sstr_alloca(i_startLen + i_addLen + 1);        \
         internal_$insert_helper(i_str, i_res, i_add,           \
                                 _index, i_startLen, i_addLen); \
         i_res[i_startLen + i_addLen] = '\0';                   \
@@ -230,7 +244,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
         }                                        \
                                                  \
         if(s_len > 0){                           \
-            s_res = alloca(s_len + 1);           \
+            s_res = sstr_alloca(s_len + 1);      \
             memcpy(s_res, s_a + s_start, s_len); \
             s_res[s_len] = '\0';                 \
         }  else {                                \
@@ -274,7 +288,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
     }                           \
                                 \
     int len = strlen(st_a);     \
-    $ new = alloca(len);        \
+    $ new = sstr_alloca(len);   \
     memcpy(new, st_a, len + 1); \
     new;                        \
 })

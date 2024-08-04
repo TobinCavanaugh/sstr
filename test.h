@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "tests/test_append.h"
+#include "tests/test_from.h"
 #include "tests/test_insert.h"
 #include "tests/test_realize.h"
 #include "tests/test_stackify.h."
@@ -36,6 +37,17 @@ void test_all() {
     printf("%d  ", test_$insert_5());
     printf("%d  ", test_$insert_6());
     printf("%d  ", test_$insert_7());
+
+    printf("\n");
+
+
+    printf("From        Tests:  ");
+
+
+    printf("%d  ", test_$from_0());
+    printf("%d  ", test_$from_1());
+    printf("%d  ", test_$from_2());
+    printf("%d  ", test_$from_3());
 
     printf("\n");
 

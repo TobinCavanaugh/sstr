@@ -47,6 +47,8 @@ int test_$append_4() {
     return strcmp(x, "") == 0;
 }
 
+/// Append nothing to nothing
+/// \return
 int test_$append_5(){
     $ x = $append("", "");
     return strcmp(x, "") == 0;
