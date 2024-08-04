@@ -6,7 +6,7 @@ Documentation at: https://tobincavanaugh.github.io/sstr/
 #### Why use `sstr.h`?
 1. No more manual freeing and allocating of temporary working strings.
 2. No worry about buffer overflows in the case of doing fixed size buffers with stdlib string functions.
-3. Minimal function call overhead.
+3. Full NULL safety, no functions will ever return a NULL pointer.
 4. Significantly faster than heap allocation, without the chance for memory leaks.
 
 #### Why not to use `sstr.h`
