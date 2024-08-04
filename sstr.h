@@ -1,3 +1,5 @@
+/*!!! sstr.h relies on statement expressions. !!!*/
+
 /* Notes:
  * Current stability : 8/10
  * WARNING: alloca allocations are not validated in any way. apparently the
@@ -76,16 +78,19 @@
 
 
 /// Creates a new $ with the corresponding size and matching data.
-/// This is primarily an internal function, and does not handle NULL
-/// safety. Thus its use should be avoided.
+/// This is primarily an internal function, and is not particularly safe. You
+/// should have no good reason to use this.
 /// @param r_a : The base $ to be resized
 /// @param size : The size of the new $
 /// @returns $ : The new $
-#define $resize(r_a, size) ({              \
-    $ re_a = r_a;                          \
-    char * r_res = sstr_alloca(size);      \
-    memcpy(r_res, re_a, strlen(re_a) + 1); \
-    r_res;                                 \
+#define $resize(r_a, size) ({                  \
+    $ re_a = r_a;                              \
+    $ r_res = sstr_alloca(size);               \
+    r_res[0] = '\0';                           \
+    if(re_a != NULL){                          \
+        memcpy(r_res, re_a, strlen(re_a) + 1); \
+    }                                          \
+    r_res;                                     \
 })
 
 /// Creates a $ from a C printf style format and args.
