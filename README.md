@@ -12,6 +12,7 @@ Documentation at: https://tobincavanaugh.github.io/sstr/
 #### Why not to use `sstr.h`
 1. Limited stack size: `sstr.h` cannot take into account the space remaining in the stack, so irresponsible use can cause a stack overflow.
 2. You have a compiler that cannot do statement expressions.
+3. You can do fixed size buffers safely.
 
 #### Hello World Example:
 ```C
