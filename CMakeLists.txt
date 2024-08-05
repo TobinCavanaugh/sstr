@@ -7,6 +7,6 @@ set(CMAKE_C_COMPILER "gcc")
 #-D_FORTIFY_SOURCE=3
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -fstack-protector-all")
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O3")
+#set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O3")
 
 add_executable(sstr main.c sstr.h)
