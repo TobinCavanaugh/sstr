@@ -57,7 +57,7 @@ int test_$substr_5() {
 
 /// Test with null string
 /// \return
-int test_$substr_6(){
+int test_$substr_6() {
     $ res = $substr(NULL, 7, 10);
     return strcmp(res, "") == 0;
 }

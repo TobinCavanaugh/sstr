@@ -8,13 +8,13 @@
 #include "sstr.h"
 #include "sw.h"
 
-#define BENCHMARK_ITERATIONS 000
+#define BENCHMARK_ITERATIONS 1000
 //#define BENCHMARK_ITERATIONS 1
 
 void bench_$append() {
+
     char *base = "Object-oriented programming is an exceptionally bad idea which could only have originated in California.";
     char *app = " - Edsger Dijkstra";
-
 
     /*sstr.h benchmark*/
     {
@@ -23,9 +23,8 @@ void bench_$append() {
         int i = 0;
         for (; i < BENCHMARK_ITERATIONS; i++) {
             $begin(__)
-                $ a = base;
+                volatile $ a = base;
                 a = $append(base, app);
-//                printf("(%s)", a);
             $end(__)
         }
 
@@ -55,7 +54,7 @@ void bench_$append() {
 
 
         c_us = sw_stop_us(c_us);
-        printf("heap @ %d iterations: %fus\n", BENCHMARK_ITERATIONS, c_us);
+        printf("heap @ %d iterations:    %fus\n", BENCHMARK_ITERATIONS, c_us);
     }
 
     /*C fixed buffer benchmark*/
@@ -64,17 +63,16 @@ void bench_$append() {
 
         int i = 0;
         for (; i < BENCHMARK_ITERATIONS; i++) {
-            char s[128];
+            volatile char s[128];
             strcpy(s, base);
             strcpy(s + strlen(base), app);
 //            printf("(%s)", s);
         }
 
         cs_us = sw_stop_us(cs_us);
-        printf("array @ %d iterations: %fus\n", BENCHMARK_ITERATIONS, cs_us);
+        printf("array @ %d iterations:   %fus\n", BENCHMARK_ITERATIONS, cs_us);
     }
 }
-
 
 void bench_all() {
     bench_$append();

@@ -1,44 +1,5 @@
+/*NOTES MOVED TO BOTTOM OF FILE*/
 /*!!! sstr.h relies on statement expressions. !!!*/
-
-/* Notes:
- * Current stability : 8/10
- * WARNING: alloca allocations are not validated in any way. apparently the
- *          POSIX way is to fall back on malloc for this, which is awesome
- *          because it's harder to validate than NULL and also means that
- *          you can get some hard to fix memory leaks. :)
- * TODO: I'd really like to have this be character format agnostic, at least
- * by allowing for local redefining of strlen and that sorta thing...
- *
- * 2024-08-04 | Tobin Cavanaugh | ----------------------------------------------
- * Favorite thing in the world is happening, -O3 causes insert to not work
- * properly. I guess I should count myself lucky that that's the only one thats
- * breaking. The tests have already paid themselves off ten-fold. Shockingly
- * this took me like 10 minutes to fix. Having functions that handle the memcpy
- * and dangerous stuff makes debugging 1,000,000x easier, this should be
- * standard behavior most of the time.
- *
- * 2024-08-01 | Tobin Cavanaugh | ----------------------------------------------
- * [X]: I really should have better comments and error handling in the code.
- * Did a huge pass of error fixes and adding tests. Still trying to avoid
- * using the term 'bug', because that implies the computer is at fault... which
- * is rarely true in C. The error pass caught a bunch of stuff,  and also
- * brought me to add the macro/function strnoe (string null or empty) which
- * returns 1 if its null or empty, and 0 if its not. Sadly had to make this
- * a statement expression, which I'd rather not do, but I have to cuz the
- * potential for errors I talked about in the previous note.
- *
- * 2024-07-31 | Tobin Cavanaugh | ---------------------------------------------
- * Realized recently I forgot to immediately memoize the arguments of the
- * macros. Whenever you're using macros its key to not re-use the same argument
- * names later in your function, Brian Kernighan talks about this well in his
- * talk on programming idioms, but the short of it is that operators like ++
- * also get passed, as macros are just textual replacement. In the case of a
- * macro taking argument `a`, if whats passed is `i++` any time the argument
- * `a` is used, it will place `i++` in, thus incrementing multiple times. This
- * is a pretty hellish bug, so I'm glad I saw the talk he did on this and a few
- * similar things. Also note I'm migrating all I can to functions to allow for
- * more helpful error lines and debugging.
- */
 
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
@@ -65,7 +26,7 @@
 /// as to allow arena allocation like behavior. Use $realize to
 /// convert a stack $ to a heap string.
 /// @param NAME : Unique name to link with $end
-#define $begin(NAME) void __run_ ## NAME (void){
+#define $begin(NAME) SSTR_API void __run_ ## NAME (void){
 
 /// Used in combination with $begin(1)
 /// @param NAME : Unique name to link with $begin
@@ -77,7 +38,7 @@
 #define $from(_a) ({                        \
     $ f_a = _a;                             \
     $ f_new = "";                           \
-    if(f_a != NULL){                        \
+    if(f_a != NULL) {                       \
         int f_len = strlen(f_a);            \
         f_new = ($) sstr_alloca(f_len + 1); \
         memcpy(f_new, f_a, f_len + 1);      \
@@ -96,7 +57,7 @@
     $ re_a = r_a;                              \
     $ r_res = sstr_alloca(size);               \
     r_res[0] = '\0';                           \
-    if(re_a != NULL){                          \
+    if(re_a != NULL) {                         \
         memcpy(r_res, re_a, strlen(re_a) + 1); \
     }                                          \
     r_res;                                     \
@@ -143,22 +104,22 @@ SSTR_API static void internal_$append_helper($ a_res, $ a, int alen, $ b) {
     $ a_res = NULL;                                       \
                                                           \
     /*Do our normal logic if both args are valid*/        \
-    if(!strnoe(a_a) && !strnoe(a_b)){                     \
+    if(!strnoe(a_a) && !strnoe(a_b)) {                    \
         int a_alen = strlen(a_a);                         \
         int a_blen = strlen(a_b);                         \
         a_res = $resize(a_a, a_alen + a_blen + 1);        \
         internal_$append_helper(a_res, a_a, a_alen, a_b); \
     }                                                     \
     /*If _a is null, _b is our fallback*/                 \
-    if(strnoe(a_a) && !strnoe(a_b)){                      \
+    if(strnoe(a_a) && !strnoe(a_b)) {                     \
         a_res = $from(a_b);                               \
     }                                                     \
     /*If _b is null, _a is our fallback*/                 \
-    if(strnoe(a_b) && !strnoe(a_a)){                      \
+    if(strnoe(a_b) && !strnoe(a_a)) {                     \
         a_res = $from(a_a);                               \
     }                                                     \
     /*If both are NULL, "" is our fallback*/              \
-    if(strnoe(a_a) && strnoe(a_b)){                       \
+    if(strnoe(a_a) && strnoe(a_b)) {                      \
         a_res = "";                                       \
     }                                                     \
                                                           \
@@ -220,15 +181,15 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
         i_res[i_startLen + i_addLen] = '\0';                   \
     }                                                          \
                                                                \
-    if(!strnoe(i_str) && strnoe(i_add)){                       \
+    if(!strnoe(i_str) && strnoe(i_add)) {                      \
         i_res = $from(i_str);                                  \
     }                                                          \
                                                                \
-    if(strnoe(i_str) && !strnoe(i_add)){                       \
+    if(strnoe(i_str) && !strnoe(i_add)) {                      \
         i_res = $from(i_add);                                  \
     }                                                          \
                                                                \
-    if(strnoe(i_str) && strnoe(i_add)){                        \
+    if(strnoe(i_str) && strnoe(i_add)) {                       \
         i_res = $from("");                                     \
     }                                                          \
                                                                \
@@ -249,7 +210,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
     $ s_res = NULL;                              \
                                                  \
     /*If we need to do any substr at all*/       \
-    if(!strnoe(s_a) && s_len > 0){               \
+    if(!strnoe(s_a) && s_len > 0) {              \
         int s_alen = strlen(s_a);                \
         if(s_start < 0){                         \
             s_len += s_start;                    \
@@ -257,11 +218,11 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
         }                                        \
                                                  \
         /*Prevent out of bounds accessing*/      \
-        while(s_start + s_len > s_alen){         \
+        while(s_start + s_len > s_alen) {        \
             s_len--;                             \
         }                                        \
                                                  \
-        if(s_len > 0){                           \
+        if(s_len > 0) {                          \
             s_res = sstr_alloca(s_len + 1);      \
             memcpy(s_res, s_a + s_start, s_len); \
             s_res[s_len] = '\0';                 \
@@ -270,11 +231,11 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
         }                                        \
     }                                            \
                                                  \
-    if(s_len <= 0){                              \
+    if(s_len <= 0) {                             \
         s_res = $from("");                       \
     }                                            \
                                                  \
-    if(strnoe(s_a)){                             \
+    if(strnoe(s_a)) {                            \
         s_res = $from("");                       \
     }                                            \
                                                  \
@@ -286,7 +247,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 /// @returns char * : A char pointer to the newly allocated string
 #define $realize(_a) ({           \
     $ rel_a = _a;                 \
-    if(strnoe(_a)){               \
+    if(strnoe(_a)) {              \
         rel_a = "";               \
     }                             \
     int len = strlen(rel_a);      \
@@ -301,7 +262,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 #define $stackify(_a) ({        \
     $ st_a = _a;                \
                                 \
-    if(strnoe(_a)){             \
+    if(strnoe(_a)) {            \
         st_a = "";              \
     }                           \
                                 \
@@ -312,3 +273,50 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 })
 
 #endif //SSTR_SSTR_H
+
+/* Notes:
+ * Current stability : 8/10
+ * WARNING: alloca allocations are not validated in any way. apparently the
+ *          POSIX way is to fall back on malloc for this, which is awesome
+ *          because it's harder to validate than NULL and also means that
+ *          you can get some hard to fix memory leaks. :)
+ * TODO: I'd really like to have this be character format agnostic, at least
+ * by allowing for local redefining of strlen and that sorta thing...
+ *
+ * 2024-08-07 | Tobin Cavanaugh | ---------------------------------------------
+ * New update here. Of course I've already got my eye on doing a new string
+ * library, i'm thinking sstr + fstr + a new cool thing where I make strings
+ * into chunks, so minor string edits are nearly instant... indexing might
+ * be a pain tho. Either way I added benchmarking of $append to the readme,
+ * and I've gotta make more benchmarks, I'm just being lazy.
+ *
+ * 2024-08-04 | Tobin Cavanaugh | ---------------------------------------------
+ * Favorite thing in the world is happening, -O3 causes insert to not work
+ * properly. I guess I should count myself lucky that that's the only one thats
+ * breaking. The tests have already paid themselves off ten-fold. Shockingly
+ * this took me like 10 minutes to fix. Having functions that handle the memcpy
+ * and dangerous stuff makes debugging 1,000,000x easier, this should be
+ * standard behavior most of the time.
+ *
+ * 2024-08-01 | Tobin Cavanaugh | ---------------------------------------------
+ * [X]: I really should have better comments and error handling in the code.
+ * Did a huge pass of error fixes and adding tests. Still trying to avoid
+ * using the term 'bug', because that implies the computer is at fault... which
+ * is rarely true in C. The error pass caught a bunch of stuff,  and also
+ * brought me to add the macro/function strnoe (string null or empty) which
+ * returns 1 if its null or empty, and 0 if its not. Sadly had to make this
+ * a statement expression, which I'd rather not do, but I have to cuz the
+ * potential for errors I talked about in the previous note.
+ *
+ * 2024-07-31 | Tobin Cavanaugh | ---------------------------------------------
+ * Realized recently I forgot to immediately memoize the arguments of the
+ * macros. Whenever you're using macros its key to not re-use the same argument
+ * names later in your function, Brian Kernighan talks about this well in his
+ * talk on programming idioms, but the short of it is that operators like ++
+ * also get passed, as macros are just textual replacement. In the case of a
+ * macro taking argument `a`, if whats passed is `i++` any time the argument
+ * `a` is used, it will place `i++` in, thus incrementing multiple times. This
+ * is a pretty hellish bug, so I'm glad I saw the talk he did on this and a few
+ * similar things. Also note I'm migrating all I can to functions to allow for
+ * more helpful error lines and debugging.
+ */
