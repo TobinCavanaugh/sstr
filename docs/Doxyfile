@@ -903,7 +903,7 @@ WARN_LINE_FORMAT       = "at line $line of file $file"
 # error (stderr). In case the file specified cannot be opened for writing the
 # warning and error messages are written to standard error. When as file - is
 # specified the warning and error messages are written to standard output
-# (stdout).
+# (stdout_handle).
 
 WARN_LOGFILE           =
 
