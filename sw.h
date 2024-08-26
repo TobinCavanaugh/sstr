@@ -58,7 +58,7 @@
 inline double sw_start_us() {
     struct timespec a;
     clock_gettime(CLOCK_MONOTONIC, &a);
-    return a.tv_nsec / 1000.0;
+    return a.tv_nsec / 1000.0 + (double) a.tv_sec * 1000.0 * 1000.0;
 }
 
 /// Stop the microsecond timer
