@@ -9,8 +9,13 @@
 #include <string.h>
 #include <stdint.h>
 
-//#define sstr_alloca(size) ({char * ptr = (char*) __builtin_alloca(size); ptr;})
-#define sstr_alloca(size) ({ char * a_x = (char*) alloca(size); a_x;})
+#define memcpy(__a,__b,__c) mem_copy(__a,__b,__c)
+#define strcpy(__a, __b) str_copy(__a, __b)
+#define strlen(a) str_len(a)
+
+
+#define sstr_alloca(size) ({char * ptr = (char*) salloc(size); ptr;})
+// #define sstr_alloca(size) ({ char * a_x = (char*) alloca(size); a_x;})
 
 /// Returns 1 if the string is NULL or empty
 #define strnoe(_s_a) ({char * ss_a = _s_a; (ss_a == NULL || ss_a[0] == '\0');})
