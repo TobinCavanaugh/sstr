@@ -41,7 +41,7 @@ void bench_$append() {
             int baseLen = strlen(base);
             int appLen = strlen(app);
 
-            char *s = malloc(baseLen + 1);
+            char *s = halloc(baseLen + 1);
             strcpy(s, base);
 
             s = realloc(s, baseLen + appLen + 1);
@@ -49,7 +49,7 @@ void bench_$append() {
 
 //            printf("(%s)", s);
 
-            free(s);
+            hfree(s);
         }
 
 

@@ -6,8 +6,9 @@
 #define SSTR_TEST_H
 
 #include "sstr.h"
-#include <stdio.h>
-#include <string.h>
+// #include <stdio.h>
+// #include <string.h>
+#include "../str/str_cmp.h"
 
 #include "tests/test_append.h"
 #include "tests/test_from.h"
@@ -18,64 +19,64 @@
 
 
 void test_all() {
-    printf("Append      Tests:  ");
-    printf("%d  ", test_$append_0());
-    printf("%d  ", test_$append_1());
-    printf("%d  ", test_$append_2());
-    printf("%d  ", test_$append_3());
-    printf("%d  ", test_$append_4());
-    printf("%d  ", test_$append_5());
+    put_f("Append      Tests:  ");
+    put_f("{0}  ", test_$append_0());
+    put_f("{0}  ", test_$append_1());
+    put_f("{0}  ", test_$append_2());
+    put_f("{0}  ", test_$append_3());
+    put_f("{0}  ", test_$append_4());
+    put_f("{0}  ", test_$append_5());
 
-    printf("\n");
+    put_f("\n");
 
-    printf("Insert      Tests:  ");
-    printf("%d  ", test_$insert_0());
-    printf("%d  ", test_$insert_1());
-    printf("%d  ", test_$insert_2());
-    printf("%d  ", test_$insert_3());
-    printf("%d  ", test_$insert_4());
-    printf("%d  ", test_$insert_5());
-    printf("%d  ", test_$insert_6());
-    printf("%d  ", test_$insert_7());
+    put_f("Insert      Tests:  ");
+    put_f("{0}  ", test_$insert_0());
+    put_f("{0}  ", test_$insert_1());
+    put_f("{0}  ", test_$insert_2());
+    put_f("{0}  ", test_$insert_3());
+    put_f("{0}  ", test_$insert_4());
+    put_f("{0}  ", test_$insert_5());
+    put_f("{0}  ", test_$insert_6());
+    put_f("{0}  ", test_$insert_7());
 
-    printf("\n");
-
-
-    printf("From        Tests:  ");
+    put_f("\n");
 
 
-    printf("%d  ", test_$from_0());
-    printf("%d  ", test_$from_1());
-    printf("%d  ", test_$from_2());
-    printf("%d  ", test_$from_3());
+    put_f("From        Tests:  ");
 
-    printf("\n");
 
-    printf("Realize     Tests:  ");
+    put_f("{0}  ", test_$from_0());
+    put_f("{0}  ", test_$from_1());
+    put_f("{0}  ", test_$from_2());
+    put_f("{0}  ", test_$from_3());
 
-    printf("%d  ", test_$realize_0());
-    printf("%d  ", test_$realize_1());
-    printf("%d  ", test_$realize_2());
+    put_f("\n");
 
-    printf("\n");
+    put_f("Realize     Tests:  ");
 
-    printf("Stackify    Tests:  ");
+    put_f("{0}  ", test_$realize_0());
+    put_f("{0}  ", test_$realize_1());
+    put_f("{0}  ", test_$realize_2());
 
-    printf("%d  ", test_$stackify_0());
-    printf("%d  ", test_$stackify_1());
-    printf("%d  ", test_$stackify_2());
-    printf("\n");
+    put_f("\n");
 
-    printf("Substring   Tests:  ");
-    printf("%d  ", test_$substr_0());
-    printf("%d  ", test_$substr_1());
-    printf("%d  ", test_$substr_2());
-    printf("%d  ", test_$substr_3());
-    printf("%d  ", test_$substr_4());
-    printf("%d  ", test_$substr_5());
-    printf("%d  ", test_$substr_6());
+    put_f("Stackify    Tests:  ");
 
-    printf("\n");
+    put_f("{0}  ", test_$stackify_0());
+    put_f("{0}  ", test_$stackify_1());
+    put_f("{0}  ", test_$stackify_2());
+    put_f("\n");
+
+    put_f("Substring   Tests:  ");
+    put_f("{0}  ", test_$substr_0());
+    put_f("{0}  ", test_$substr_1());
+    put_f("{0}  ", test_$substr_2());
+    put_f("{0}  ", test_$substr_3());
+    put_f("{0}  ", test_$substr_4());
+    put_f("{0}  ", test_$substr_5());
+    put_f("{0}  ", test_$substr_6());
+
+    put_f("\n");
 }
 
 

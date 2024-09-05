@@ -256,7 +256,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
         rel_a = "";               \
     }                             \
     int len = strlen(rel_a);      \
-    char * new = malloc(len + 1); \
+    char * new = halloc(len + 1); \
     memcpy(new, rel_a, len + 1);  \
     new;                          \
 })

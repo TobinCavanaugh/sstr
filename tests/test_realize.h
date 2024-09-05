@@ -9,8 +9,8 @@
 /// \return
 int test_$realize_0() {
     char *x = $realize("Test");
-    int r = strcmp("Test", x) == 0;
-    free(x);
+    int r = str_cmp("Test", x) == 0;
+    hfree(x);
     return r;
 }
 
@@ -18,8 +18,8 @@ int test_$realize_0() {
 /// \return
 int test_$realize_1() {
     char *x = $realize("");
-    int r = strcmp("", x) == 0;
-    free(x);
+    int r = str_cmp("", x) == 0;
+    hfree(x);
     return r;
 }
 
@@ -27,8 +27,8 @@ int test_$realize_1() {
 /// \return
 int test_$realize_2() {
     char *x = $realize(NULL);
-    int r = strcmp("", x) == 0;
-    free(x);
+    int r = str_cmp("", x) == 0;
+    hfree(x);
     return r;
 }
 

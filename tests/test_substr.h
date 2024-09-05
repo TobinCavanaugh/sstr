@@ -10,7 +10,7 @@
 int test_$substr_0() {
     $ base = "012345";
     $ sub = $substr(base, 0, 2);
-    return strcmp(sub, "01") == 0;
+    return str_cmp(sub, "01") == 0;
 }
 
 /// Substring with index and length of 0
@@ -18,7 +18,7 @@ int test_$substr_0() {
 int test_$substr_1() {
     $ base = "012345";
     $ sub = $substr(base, 0, 0);
-    return strcmp(sub, "") == 0;
+    return str_cmp(sub, "") == 0;
 }
 
 /// Substring with index -100 and length 101, sampling the first char
@@ -26,7 +26,7 @@ int test_$substr_1() {
 int test_$substr_2() {
     $ base = "012345";
     $ sub = $substr(base, -100, 101);
-    return strcmp(sub, "0") == 0;
+    return str_cmp(sub, "0") == 0;
 }
 
 /// Substring with index and length positively out of bounds
@@ -34,7 +34,7 @@ int test_$substr_2() {
 int test_$substr_3() {
     $ base = "0123456789";
     $ sub = $substr(base, 1000, 1000);
-    return strcmp(sub, "") == 0;
+    return str_cmp(sub, "") == 0;
 }
 
 /// Substring with index and length negatively out of bounds
@@ -42,7 +42,7 @@ int test_$substr_3() {
 int test_$substr_4() {
     $ base = "0123456789";
     $ sub = $substr(base, -1000, -1000);
-    return strcmp(sub, "") == 0;
+    return str_cmp(sub, "") == 0;
 }
 
 /// Test with index 0 and positive & negative out of bounds length
@@ -52,14 +52,14 @@ int test_$substr_5() {
     //Should negative length get the string from the index backwards?...
     $ subNeg = $substr(base, 0, -1000);
     $ subPos = $substr(base, 0, 1000);
-    return ((strcmp(subNeg, "") == 0) && (strcmp(subPos, base) == 0));
+    return ((str_cmp(subNeg, "") == 0) && (str_cmp(subPos, base) == 0));
 }
 
 /// Test with null string
 /// \return
 int test_$substr_6() {
     $ res = $substr(NULL, 7, 10);
-    return strcmp(res, "") == 0;
+    return str_cmp(res, "") == 0;
 }
 
 #endif //SSTR_TEST_SUBSTR_H

@@ -11,25 +11,25 @@
 /// \return
 int test_$stackify_0() {
     $ tmp = "ABCDEF";
-    char *x = malloc(strlen(tmp));
+    char *x = halloc(strlen(tmp));
     strcpy(x, tmp);
 
     $ stack = $stackify(x);
-    free(x);
+    hfree(x);
 
-    return strcmp(tmp, stack) == 0;
+    return str_cmp(tmp, stack) == 0;
 }
 
 /// Test stackifying null
 /// \return
 int test_$stackify_1() {
-    return strcmp("", $stackify(NULL)) == 0;
+    return str_cmp("", $stackify(NULL)) == 0;
 }
 
 /// Test stackifying nothing
 /// \return
 int test_$stackify_2() {
-    return strcmp("", $stackify("")) == 0;
+    return str_cmp("", $stackify("")) == 0;
 }
 
 #endif //SSTR_TEST_STACKIFY_H
