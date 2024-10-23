@@ -11,8 +11,8 @@
 /// \return
 int test_$stackify_0() {
     $ tmp = "ABCDEF";
-    char *x = halloc(strlen(tmp));
-    strcpy(x, tmp);
+    char *x = halloc(str_len(tmp));
+    str_copy(x, tmp);
 
     $ stack = $stackify(x);
     hfree(x);

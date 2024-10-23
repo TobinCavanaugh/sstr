@@ -38,14 +38,14 @@ void bench_$append() {
 
         int i = 0;
         for (; i < BENCHMARK_ITERATIONS; i++) {
-            int baseLen = strlen(base);
-            int appLen = strlen(app);
+            int baseLen = str_len(base);
+            int appLen = str_len(app);
 
             char *s = halloc(baseLen + 1);
-            strcpy(s, base);
+            str_copy(s, base);
 
             s = realloc(s, baseLen + appLen + 1);
-            strcpy(s + baseLen, app);
+            str_copy(s + baseLen, app);
 
 //            printf("(%s)", s);
 
@@ -64,8 +64,8 @@ void bench_$append() {
         int i = 0;
         for (; i < BENCHMARK_ITERATIONS; i++) {
             volatile char s[128];
-            strcpy(s, base);
-            strcpy(s + strlen(base), app);
+            str_copy(s, base);
+            str_copy(s + str_len(base), app);
 //            printf("(%s)", s);
         }
 

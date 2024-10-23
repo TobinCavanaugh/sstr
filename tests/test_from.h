@@ -29,9 +29,10 @@ int test_$from_2() {
 /// From a heap string test
 /// \return
 int test_$from_3() {
-    char *tmp = "A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines";
-    char *x = halloc(strlen(tmp) + 1);
-    strcpy(x, tmp);
+    char* tmp =
+        "A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines";
+    char* x = halloc(str_len(tmp) + 1);
+    str_copy(x, tmp);
 
     $ s = $from(x);
     hfree(x);

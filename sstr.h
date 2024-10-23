@@ -4,14 +4,17 @@
 #ifndef SSTR_SSTR_H
 #define SSTR_SSTR_H
 
-#include <stdlib.h>
-#include <memory.h>
-#include <string.h>
-#include <stdint.h>
+// #include <stdlib.h>
+// #include <memory.h>
+// #include <string.h>
+// #include <stdint.h>
 
-#define memcpy(__a,__b,__c) mem_copy(__a,__b,__c)
-#define strcpy(__a, __b) str_copy(__a, __b)
-#define strlen(a) str_len(a)
+#include "../dialect.h"
+#include "../mem/salloc.h"
+
+// #define mem_copy(__a,__b,__c) mem_copy(__a,__b,__c)
+// #define str_copy(__a, __b) str_copy(__a, __b)
+// #define str_len(a) str_len(a)
 
 
 #define sstr_alloca(size) ({char * ptr = (char*) salloc(size); ptr;})
@@ -44,9 +47,9 @@
     $ f_a = _a;                             \
     $ f_new = "";                           \
     if(f_a != NULL) {                       \
-        int f_len = strlen(f_a);            \
+        int f_len = str_len(f_a);            \
         f_new = ($) sstr_alloca(f_len + 1); \
-        memcpy(f_new, f_a, f_len + 1);      \
+        mem_copy(f_new, f_a, f_len + 1);      \
     }                                       \
     f_new;                                  \
 })
@@ -63,7 +66,7 @@
     $ r_res = sstr_alloca(size);               \
     r_res[0] = '\0';                           \
     if(re_a != NULL) {                         \
-        memcpy(r_res, re_a, strlen(re_a) + 1); \
+        mem_copy(r_res, re_a, str_len(re_a) + 1); \
     }                                          \
     r_res;                                     \
 })
@@ -94,8 +97,8 @@
 })
 
 SSTR_API static void internal_$append_helper($ a_res, $ a, int alen, $ b) {
-    strcpy(a_res, a);
-    strcpy(a_res + alen, b);
+    str_copy(a_res, a);
+    str_copy(a_res + alen, b);
 }
 
 /// Appends b to a.
@@ -110,8 +113,8 @@ SSTR_API static void internal_$append_helper($ a_res, $ a, int alen, $ b) {
                                                           \
     /*Do our normal logic if both args are valid*/        \
     if(!strnoe(a_a) && !strnoe(a_b)) {                    \
-        int a_alen = strlen(a_a);                         \
-        int a_blen = strlen(a_b);                         \
+        int a_alen = str_len(a_a);                         \
+        int a_blen = str_len(a_b);                         \
         a_res = $resize(a_a, a_alen + a_blen + 1);        \
         internal_$append_helper(a_res, a_a, a_alen, a_b); \
     }                                                     \
@@ -143,22 +146,22 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
 
     /*Copy in our default content, this caused a little bug but thanks to this
      * being in a function it was super easy to debug. */
-    memcpy(i_res, _str, startLen);
+    mem_copy(i_res, _str, startLen);
 
     /*Grab the content to the right of our index and put it into our tmp*/
-    memcpy(tmp, _str + index, rightSize + 1);
+    mem_copy(tmp, _str + index, rightSize + 1);
 
     /*Place that grabbed temporary string and place it at the end of our str*/
-    memcpy(i_res + (index + addLen), tmp, rightSize);
+    mem_copy(i_res + (index + addLen), tmp, rightSize);
 
     /*Place our addstring in the center, overwriting the old content*/
-    memcpy(i_res + index, _add, addLen);
+    mem_copy(i_res + index, _add, addLen);
 }
 
 /// Inserts _add into the $ _str at _index
 /// @param str : The base string
 /// @param index : The index in _str for _add to be inserted at. This will be
-/// clamped between [0 and strLen+1].
+/// clamped between [0 and str_len+1].
 /// @param add : The $ to be inserted
 /// @returns $ : A $ with the same contents as _str but with _add inserted.
 #define $insert(str, index, add) ({                            \
@@ -169,8 +172,8 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
                                                                \
     /*Do regular business logic*/                              \
     if(!strnoe(i_str) && !strnoe(i_add)){                      \
-        int i_startLen = strlen(i_str);                        \
-        int i_addLen = strlen(i_add);                          \
+        int i_startLen = str_len(i_str);                        \
+        int i_addLen = str_len(i_add);                          \
                                                                \
         /*Cap our insert point within string bounds*/          \
         if(_index > i_startLen) {                              \
@@ -216,7 +219,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
                                                  \
     /*If we need to do any substr at all*/       \
     if(!strnoe(s_a) && s_len > 0) {              \
-        int s_alen = strlen(s_a);                \
+        int s_alen = str_len(s_a);                \
         if(s_start < 0){                         \
             s_len += s_start;                    \
             s_start = 0;                         \
@@ -229,7 +232,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
                                                  \
         if(s_len > 0) {                          \
             s_res = sstr_alloca(s_len + 1);      \
-            memcpy(s_res, s_a + s_start, s_len); \
+            mem_copy(s_res, s_a + s_start, s_len); \
             s_res[s_len] = '\0';                 \
         }  else {                                \
             s_res = $from("");                   \
@@ -255,9 +258,9 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
     if(strnoe(_a)) {              \
         rel_a = "";               \
     }                             \
-    int len = strlen(rel_a);      \
+    int len = str_len(rel_a);      \
     char * new = halloc(len + 1); \
-    memcpy(new, rel_a, len + 1);  \
+    mem_copy(new, rel_a, len + 1);  \
     new;                          \
 })
 
@@ -271,9 +274,9 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
         st_a = "";              \
     }                           \
                                 \
-    int len = strlen(st_a);     \
+    int len = str_len(st_a);     \
     $ new = sstr_alloca(len);   \
-    memcpy(new, st_a, len + 1); \
+    mem_copy(new, st_a, len + 1); \
     new;                        \
 })
 
@@ -286,7 +289,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
  *          because it's harder to validate than NULL and also means that
  *          you can get some hard to fix memory leaks. :)
  * TODO: I'd really like to have this be character format agnostic, at least
- * by allowing for local redefining of strlen and that sorta thing...
+ * by allowing for local redefining of str_len and that sorta thing...
  *
  * 2024-08-07 | Tobin Cavanaugh | ---------------------------------------------
  * New update here. Of course I've already got my eye on doing a new string
@@ -299,7 +302,7 @@ SSTR_API static void internal_$insert_helper($ _str, $ i_res, $ _add,
  * Favorite thing in the world is happening, -O3 causes insert to not work
  * properly. I guess I should count myself lucky that that's the only one thats
  * breaking. The tests have already paid themselves off ten-fold. Shockingly
- * this took me like 10 minutes to fix. Having functions that handle the memcpy
+ * this took me like 10 minutes to fix. Having functions that handle the mem_copy
  * and dangerous stuff makes debugging 1,000,000x easier, this should be
  * standard behavior most of the time.
  *
