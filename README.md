@@ -22,7 +22,7 @@ Documentation at: https://tobincavanaugh.github.io/sstr/
 
 ```C
 // Using $from is optional
-$ a = $from("Hello");
+$ a = "Hello";
 a = $append(a, " World!");
 printf("%s\n", a);
 ```
